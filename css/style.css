@@ -1,0 +1,44 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#clock {
+    background: white;
+    padding: 40px; /* Increased padding */
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15); /* Slightly larger shadow for effect */
+    text-align: center;
+    width: 80%; /* Optional: You might want to set a maximum width */
+    max-width: 600px; /* Maximum width */
+}
+
+.time-display {
+    margin-bottom: 30px; /* Increased margin */
+}
+
+.time-display:last-child {
+    margin-bottom: 0;
+}
+
+h2 {
+    margin: 0 0 15px 0; /* Increased spacing */
+    color: #4a90e2;
+    font-size: 28px; /* Larger font size for headers */
+}
+
+div {
+    font-size: 30px; /* Increased font size for time display */
+    font-weight: bold;
+}
+
+span {
+    color: #e74c3c;
+}
