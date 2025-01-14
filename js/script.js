@@ -34,6 +34,12 @@ function updateClock() {
   // Calculate days passed in the year
   const dayCounter = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
   document.getElementById('dayCounterValue').textContent = dayCounter;
+
+// Calculate milliseconds to next midnight
+const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+const msToMidnight = nextMidnight - now;
+document.getElementById('msToMidnightValue').textContent = msToMidnight;
+
 }
 
 setInterval(updateClock, 1000); // Update every second
