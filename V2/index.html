@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bad Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+  </head>
+  <body>
+    <div class="shuffleWrap"><button class="shuffle">Shuffle order of boxes</button></div>
+    <div class="grid">
+      <div class="box blue wide">
+        <div class="time-display"><span id="minutesValue">0</span></div>
+        <div class="time-name"> Minutes Past Midnight</div>
+        <div class="time-info"> <span id="minutesValue">0</span> minutes past midnight </div>
+      </div>
+      <div class="box green square">
+        <div class="time-display"><span id="weeksValue">0</span></div>
+        <div class="time-name"> Week Number</div>
+        <div class="time-info"> Week Number: <span id="weeksValue">0</span></div>
+      </div>
+      <div class="box green tall">
+        <div class="time-display"><span id="epochValue">0</span></div>
+        <div class="time-name"> Time Since Epoch</div>
+        <div class="time-info"> Time since epoch: <span id="epochValue">0</span> seconds </div>
+      </div>
+      <div class="box red square">
+        <div class="time-display"><span id="reverseTimeValue">23:59</span></div>
+        <div class="time-name"> Time To Midnight</div>
+        <div class="time-info"> Time to midnight: <span id="reverseTimeValue">23:59</span></div>
+      </div>
+      <div class="box green square">
+        <div class="time-display"><span id="dayCounterValue">0</span></div>
+        <div class="time-name"> Days Into This Year</div>
+        <div class="time-info"> Day Counter: <span id="dayCounterValue">0</span> days into this year </div>
+      </div>
+      <div class="box red wide">
+        <div class="time-display"><span id="msToMidnightValue">0</span></div>
+        <div class="time-name"> Milliseconds To Midnight</div>
+        <div class="time-info"> Milliseconds to Midnight: <span id="msToMidnightValue">0</span></div>
+      </div>
+      <div class="box blue square">
+        <div class="time-display"><span id="hoursLeftInYearValue">0</span></div>
+        <div class="time-name"> Hours Till New Year!</div>
+        <div class="time-info"> Hours Left in the Year: <span id="hoursLeftInYearValue">0</span></div>
+      </div>
+      <div class="box blue tall">
+        <div class="time-display"><span id="moonPhaseValue">0</span></div>
+        <div class="time-name"> Todays Moon Phase</div>
+        <div class="time-info"> Moon Phase: <span id="moonPhaseValue">0</span></div>
+      </div>
+      <div class="box green wide">
+        <div class="time-display"><span id="julianDateValue">0</span></div>
+        <div class="time-name"> Julian Date</div>
+        <div class="time-info"> Julian Date: <span id="julianDateValue">0</span></div>
+      </div>
+      <div class="box red square">
+        <div class="time-display"><span id="internetBeatsValue">0</span></div>
+        <div class="time-name"> Swatch Time</div>
+        <div class="time-info"> Swatch Internet Time: <span id="internetBeatsValue">0</span></div>
+      </div>
+      <div class="box red square">
+        <div class="time-display"><span id="decimalTimeValue">0</span></div>
+        <div class="time-name"> Decimal Time</div>
+        <div class="time-info"> Decimal Time: <span id="decimalTimeValue">0</span></div>
+      </div>
+      <div class="box red square">
+        <div class="time-display"><span id="siderealTimeValue">0</span></div>
+        <div class="time-name"> Sidereal Time</div>
+        <div class="time-info"> Greenwich Sidereal Time: <span id="siderealTimeValue">0</span></div>
+      </div>
+      <div class="box red square">
+        <div class="time-display"><span id="dayCompletionValue">0</span></div>
+        <div class="time-name"> Earths Rotation</div>
+        <div class="time-info"> Today’s Rotation Completion: <span id="dayCompletionValue">0</span></div>
+      </div>
+    </div>
+    <script src="js/script.js"></script>
+  </body>
+</html>
