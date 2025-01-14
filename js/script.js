@@ -91,9 +91,80 @@ if (phaseFraction < 0.03 || phaseFraction > 0.97) {
 }
 }
 
-setInterval(updateClock, 1000); // Update every second
-updateClock(); // Initialise clock on page load
-
-
-setInterval(updateClock, 1000); // Update every second
-updateClock(); // Initialize clock on page load
+// ----------------------
+    // 1) Julian Date
+    // ----------------------
+    function getJulianDate(date) {
+        // Convert the date to Julian Date.
+        // This formula is typical for astronomy; the day starts at noon, hence the 0.5 offset.
+        // 1) Extract UTC year, month, day
+        let year = date.getUTCFullYear();
+        let month = date.getUTCMonth() + 1; // 1-12
+        const day = date.getUTCDate();
+  
+        // 2) If January or February, treat them as months 13 and 14 of the previous year
+        if (month <= 2) {
+          month += 12;
+          year -= 1;
+        }
+  
+        // 3) Calculate the terms
+        const A = Math.floor(year / 100);
+        const B = 2 - A + Math.floor(A / 4);
+  
+        // 4) JD at 0h UT
+        const jdAtMidnight = Math.floor(365.25 * (year + 4716)) +
+                             Math.floor(30.6001 * (month + 1)) +
+                             day + B - 1524.5;
+  
+        // 5) Add fraction of day based on UTC hours/mins/secs
+        const fractionOfDay = 
+          (date.getUTCHours() +
+           date.getUTCMinutes() / 60 +
+           date.getUTCSeconds() / 3600) / 24;
+  
+        return jdAtMidnight + fractionOfDay;
+      }
+  
+      // ----------------------
+      // 2) Next Solstice or Equinox
+      // ----------------------
+      // For simplicity, we store approximate UTC times for the next few events.
+      // You can extend this array further if needed or fetch from an API.
+      const upcomingEvents = [
+        // Format: { date: 'YYYY-MM-DDTHH:MM:SSZ', name: 'Event name' }
+        // 2025 approximate times (UTC)
+        { date: '2025-03-20T09:02:00Z', name: 'March Equinox' },
+        { date: '2025-06-21T02:42:00Z', name: 'June Solstice' },
+        { date: '2025-09-22T18:19:00Z', name: 'September Equinox' },
+        { date: '2025-12-21T17:03:00Z', name: 'December Solstice' },
+        // 2026
+        { date: '2026-03-20T14:45:00Z', name: 'March Equinox' },
+        { date: '2026-06-21T08:24:00Z', name: 'June Solstice' },
+        { date: '2026-09-23T00:11:00Z', name: 'September Equinox' },
+        { date: '2026-12-21T22:49:00Z', name: 'December Solstice' },
+        // etc...
+      ];
+  
+      function getNextSolsticeOrEquinox(now) {
+        // Convert "now" to time in ms
+        const nowMs = now.getTime();
+  
+        // Find the first event whose date is after "now"
+        for (const evt of upcomingEvents) {
+          const evtDate = new Date(evt.date);
+          if (evtDate.getTime() > nowMs) {
+            // This is our next event
+            return { name: evt.name, date: evtDate };
+          }
+        }
+        // If none found, default to last in array or handle differently
+        // e.g. return the last event
+        const last = upcomingEvents[upcomingEvents.length - 1];
+        return { name: last.name, date: new Date(last.date) };
+      }
+  
+      // Update every second
+      setInterval(updateClock, 1000);
+      // Initialise on page load
+      updateClock();
