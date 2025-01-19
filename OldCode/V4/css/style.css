@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    padding: 20px;
+}
+
+.box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #ddd;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.box:hover {
+    background-color: #bbb;
+}
+
+.box .time-display {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.box .time-name {
+    font-size: 1em;
+    color: #555;
+}
+
+.box .time-info {
+    font-size: 0.85em;
+    color: #333;
+    margin-top: 10px;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    display: flex;
+    gap: 20px;
+}
+
+.modal-left {
+    flex: 1;
+}
+
+.modal-right {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.close-btn {
+    margin-top: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}

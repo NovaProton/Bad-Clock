@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Time Grid</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="grid" id="gridContainer"></div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-left">
+      <div class="modal-header">About</div>
+      <p id="modalDescription"></p>
+    </div>
+    <div class="modal-right">
+      <pre><code class="language-javascript" id="codeSnippet"></code></pre>
+    </div>
+  </div>
+  <button class="close-btn" id="closeModal">Close</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gridContainer = document.getElementById('gridContainer');
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const modalDescription = document.getElementById('modalDescription');
+    const codeSnippet = document.getElementById('codeSnippet');
+
+    const tiles = [
+      {
+        id: 'minutes',
+        color: 'blue',
+        size: 'wide',
+        timeDisplay: function () {
+          const now = new Date();
+          return now.getHours() * 60 + now.getMinutes();
+        },
+        timeName: 'Minutes Past Midnight',
+        timeInfo: function () {
+          return `${this.timeDisplay()} minutes past midnight`;
+        }
+      },
+      {
+        id: 'weeks',
+        color: 'green',
+        size: 'square',
+        timeDisplay: function () {
+          const now = new Date();
+          const startOfYear = new Date(now.getFullYear(), 0, 1);
+          const dayOfWeek = startOfYear.getDay();
+          const ISOWeekStart = new Date(startOfYear);
+          if (dayOfWeek <= 4) {
+            ISOWeekStart.setDate(startOfYear.getDate() - startOfYear.getDay() + 1);
+          } else {
+            ISOWeekStart.setDate(startOfYear.getDate() + 8 - startOfYear.getDay());
+          }
+          return Math.floor((now - ISOWeekStart) / (7 * 24 * 60 * 60 * 1000)) + 1;
+        },
+        timeName: 'Week Number',
+        timeInfo: function () {
+          return `Week Number: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'epoch',
+        color: 'green',
+        size: 'tall',
+        timeDisplay: function () {
+          return Math.floor(new Date() / 1000);
+        },
+        timeName: 'Seconds Since Epoch',
+        timeInfo: function () {
+          return `Time since epoch: ${this.timeDisplay()} seconds`;
+        }
+      },
+      {
+        id: 'reverseTime',
+        color: 'red',
+        size: 'square',
+        timeDisplay: function () {
+          const now = new Date();
+          const reverseHours = 23 - now.getHours();
+          const reverseMinutes = 59 - now.getMinutes();
+          const reverseSeconds = 59 - now.getSeconds();
+          return `${reverseHours.toString().padStart(2, '0')}:${reverseMinutes.toString().padStart(2, '0')}:${reverseSeconds.toString().padStart(2, '0')}`;
+        },
+        timeName: 'Time To Midnight',
+        timeInfo: function () {
+          return `Time to midnight: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'dayCounter',
+        color: 'green',
+        size: 'square',
+        timeDisplay: function () {
+          const now = new Date();
+          const startOfYear = new Date(now.getFullYear(), 0, 1);
+          return Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+        },
+        timeName: 'Days Into This Year',
+        timeInfo: function () {
+          return `Day Counter: ${this.timeDisplay()} days into this year`;
+        }
+      },
+      {
+        id: 'msToMidnight',
+        color: 'red',
+        size: 'wide',
+        timeDisplay: function () {
+          const now = new Date();
+          const nextMidnight = new Date(
+                  now.getFullYear(),
+                  now.getMonth(),
+                  now.getDate() + 1,
+                  0,
+                  0,
+                  0
+          );
+          return nextMidnight - now;
+        },
+        timeName: 'Milliseconds To Midnight',
+        timeInfo: function () {
+          return `Milliseconds to Midnight: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'hoursLeftInYear',
+        color: 'blue',
+        size: 'square',
+        timeDisplay: function () {
+          const now = new Date();
+          const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+          const msLeftInYear = endOfYear - now;
+          return Math.floor(msLeftInYear / (1000 * 60 * 60));
+        },
+        timeName: 'Hours Till New Year!',
+        timeInfo: function () {
+          return `${this.timeDisplay()} hours left in the year`;
+        }
+      },
+      {
+        id: 'moonPhase',
+        color: 'blue',
+        size: 'tall',
+        timeDisplay: function getMoonPhase(date) {
+          const synodicMonth = 29.5305882
+          const reference = new Date("2000-01-06T18:14:00Z")
+          const daysSinceReference = (date - reference) / (1000 * 60 * 60 * 24)
+          const moonAge = daysSinceReference % synodicMonth
+          const phaseFraction = moonAge / synodicMonth
+
+          if (phaseFraction < 0.03 || phaseFraction > 0.97) {
+            return "New Moon"
+          } else if (phaseFraction < 0.22) {
+            return "Waxing Crescent"
+          } else if (phaseFraction < 0.28) {
+            return "First Quarter"
+          } else if (phaseFraction < 0.47) {
+            return "Waxing Gibbous"
+          } else if (phaseFraction < 0.53) {
+            return "Full Moon"
+          } else if (phaseFraction < 0.72) {
+            return "Waning Gibbous"
+          } else if (phaseFraction < 0.78) {
+            return "Last Quarter"
+          } else {
+            return "Waning Crescent"
+          }
+        },
+        timeName: 'Today’s Moon Phase',
+        timeInfo: function () {
+          return `Moon Phase: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'julianDate',
+        color: 'green',
+        size: 'wide',
+        timeDisplay: function () {
+          return getJulianDate(new Date()).toFixed(5);
+        },
+        timeName: 'Julian Date',
+        timeInfo: function () {
+          return `Julian Date: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'internetBeats',
+        color: 'red',
+        size: 'square',
+        timeDisplay: function () {
+          return getSwatchInternetTime(new Date());
+        },
+        timeName: 'Swatch Time',
+        timeInfo: function () {
+          return `Swatch Internet Time: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'decimalTime',
+        color: 'red',
+        size: 'square',
+        timeDisplay: function () {
+          return getDecimalTime(new Date());
+        },
+        timeName: 'Decimal Time',
+        timeInfo: function () {
+          return `Decimal Time: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'siderealTime',
+        color: 'red',
+        size: 'square',
+        timeDisplay: function () {
+          return getGreenwichSiderealTime(new Date());
+        },
+        timeName: 'Sidereal Time',
+        timeInfo: function () {
+          return `Greenwich Sidereal Time: ${this.timeDisplay()}`;
+        }
+      },
+      {
+        id: 'dayCompletion',
+        color: 'red',
+        size: 'square',
+        timeDisplay: function () {
+          return getDayCompletionPercentage(new Date());
+        },
+        timeName: 'Earth’s Rotation',
+        timeInfo: function () {
+          return `Today’s Rotation Completion: ${this.timeDisplay()}`;
+        }
+      }
+    ];
+
+    // Function to create and update grid tiles
+    function updateGrid() {
+      gridContainer.innerHTML = ''; // Clear the grid
+      tiles.forEach(tile => {
+        const tileDiv = document.createElement('div');
+        tileDiv.className = `box ${tile.color} ${tile.size}`;
+        tileDiv.innerHTML = `
+                <div class="time-display">${tile.timeDisplay()}</div>
+                <div class="time-name">${tile.timeName}</div>
+                <div class="time-info">${tile.timeInfo()}</div>
+            `;
+        tileDiv.addEventListener('click', () => openModal(tile));
+        gridContainer.appendChild(tileDiv);
+      });
+    }
+
+    // Open modal with dynamic content
+    function openModal(tile) {
+      modal.classList.remove('hidden');
+      modalDescription.textContent = tile.timeInfo();
+      // Show the function's code dynamically using toString
+      codeSnippet.textContent = tile.timeDisplay.toString();
+    }
+
+    // Close modal
+    closeModal.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    // Update the grid every second
+    setInterval(updateGrid, 1000);
+    updateGrid(); // Initial call to populate the grid
+  });
+
+</script>
+<script src="js/script.js"></script>
+</body>
+</html>
