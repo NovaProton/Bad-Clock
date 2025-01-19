@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'minutes',
             name: 'Minutes Past Midnight',
             info: 'This represents the number of minutes that have passed since midnight today.',
+            link: 'https://en.wikipedia.org/wiki/Midnight',
             func: function () {
                 const now = new Date();
                 return now.getHours() * 60 + now.getMinutes();
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'epoch',
             name: 'Seconds Since Epoch',
             info: 'The number of seconds that have elapsed since January 1, 1970 (the Unix Epoch).',
+            link: 'https://en.wikipedia.org/wiki/Unix_time',
             func: function () {
                 return Math.floor(new Date() / 1000);
             }
@@ -46,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'reverseTime',
             name: 'Time To Midnight',
             info: 'The time remaining until midnight.',
+            link: 'https://www.timeanddate.com/countdown/generic',
             func: function () {
                 const now = new Date();
                 const reverseHours = 23 - now.getHours();
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'dayCounter',
             name: 'Days Into This Year',
             info: 'The number of days that have passed since the beginning of the year.',
+            link: 'https://en.wikipedia.org/wiki/Year',
             func: function () {
                 const now = new Date();
                 const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -68,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'msToMidnight',
             name: 'Milliseconds To Midnight',
             info: 'The number of milliseconds remaining until the start of the next day.',
+            link: 'https://en.wikipedia.org/wiki/Millisecond',
             func: function () {
                 const now = new Date();
                 const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
@@ -78,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'hoursLeftInYear',
             name: 'Hours Left In The Year',
             info: 'The number of hours remaining until the end of the current year.',
+            link: 'https://www.timeanddate.com/countdown/newyear',
             func: function () {
                 const now = new Date();
                 const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
@@ -89,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'internetBeats',
             name: 'Swatch Time',
             info: 'Internet Swatch time, represented in beats (@beats). One beat equals 1/1000th of a day.',
+            link: 'https://en.wikipedia.org/wiki/Swatch_Internet_Time',
             func: function () {
                 const now = new Date();
                 const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -102,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'dayCompletion',
             name: 'Earth’s Rotation',
             info: 'The percentage of the current day that has passed.',
+            link: 'https://en.wikipedia.org/wiki/Earth%27s_rotation',
             func: function () {
                 const totalSeconds = 24 * 60 * 60;
                 const now = new Date();
@@ -113,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'siderealTime',
             name: 'Greenwich Sidereal Time',
             info: 'The sidereal time at the Greenwich Meridian.',
+            link: 'https://en.wikipedia.org/wiki/Sidereal_time',
             func: function () {
                 const JD = (function getJulianDate(date) {
                     let year = date.getUTCFullYear();
@@ -149,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'decimalTime',
             name: 'Decimal Time',
             info: 'The current time of day in decimal format, where the day is divided into 10 hours.',
+            link: 'https://en.wikipedia.org/wiki/Decimal_time',
             func: function () {
                 const now = new Date();
                 const h = now.getHours();
@@ -166,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'julianDate',
             name: 'Julian Date',
             info: 'The Julian date, which represents the continuous count of days since the beginning of the Julian Period.',
+            link: 'https://en.wikipedia.org/wiki/Julian_day',
             func: function () {
                 const now = new Date();
                 let year = now.getUTCFullYear();
@@ -192,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'moonPhase',
             name: 'Moon Phase',
             info: 'The current phase of the moon based on its position relative to the Earth and Sun.',
+            link: 'https://en.wikipedia.org/wiki/Lunar_phase',
             func: function () {
                 const synodicMonth = 29.5305882;
                 const reference = new Date('2000-01-06T18:14:00Z');
@@ -222,6 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.textContent = tile.name;
             modalDescription.textContent = tile.info;
 
+            // Remove any existing "More Info" buttons
+            const existingLinkButton = document.querySelector('#modal a');
+            if (existingLinkButton) {
+                existingLinkButton.remove();
+            }
+
+            // Add the "More Info" button if the tile has a link
             if (tile.link) {
                 const linkButton = document.createElement('a');
                 linkButton.href = tile.link;
@@ -233,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             codeSnippet.textContent = tile.func.toString();
         });
+
 
         gridContainer.appendChild(tileDiv);
     });

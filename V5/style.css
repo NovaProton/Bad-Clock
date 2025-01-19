@@ -29,7 +29,41 @@ body {
     padding: 20px;
     border: 1px solid #ccc;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: auto; /* Ensure it adapts to smaller screens */
+    max-width: auto; /* Limit maximum width */
+    box-sizing: border-box; /* Include padding and borders in width calculation */
+    overflow-y: auto; /* Allow scrolling if content exceeds modal height */
+    max-height: 90vh; /* Ensure it fits within the viewport height */
+    border-radius: 8px; /* Rounded corners for modern look */
 }
+
+/* Close button and link button adjustments for spacing */
+#closeModal {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.modal a {
+    display: inline-block;
+    margin: 10px 0 0 0;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.modal a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+    .modal {
+        width: 95%;
+        padding: 15px;
+        font-size: 14px; /* Slightly smaller font size for mobile */
+    }
+}
+
 
 .modal.hidden {
     display: none;
