@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.tile {
+    padding: 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.modal {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: auto; /* Ensure it adapts to smaller screens */
+    max-width: auto; /* Limit maximum width */
+    box-sizing: border-box; /* Include padding and borders in width calculation */
+    overflow-y: auto; /* Allow scrolling if content exceeds modal height */
+    max-height: 90vh; /* Ensure it fits within the viewport height */
+    border-radius: 8px; /* Rounded corners for modern look */
+}
+
+/* Close button and link button adjustments for spacing */
+#closeModal {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.modal a {
+    display: inline-block;
+    margin: 10px 0 0 0;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.modal a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+    .modal {
+        width: 95%;
+        padding: 15px;
+        font-size: 14px; /* Slightly smaller font size for mobile */
+    }
+}
+
+/* Ensure grid is centred on desktop only */
+@media (min-width: 1024px) {
+    .grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        max-width: 1200px; /* Optional: Keep the grid width responsive */
+        margin: 0 auto;
+    }
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+}
+
+
+
+.modal.hidden {
+    display: none;
+}
+
+
+.modal-content {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
