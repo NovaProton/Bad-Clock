@@ -173,6 +173,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         {
+            id: 'isstime',
+            name: 'ISS Geographical Time',
+            info: 'The local time at the location currently below the ISS.',
+            link: 'https://time.is/ISS',
+            func: async function () {
+                try {
+                    // Fetch ISS location
+                    const issResponse = await fetch('http://api.open-notify.org/iss-now.json');
+                    const issData = await issResponse.json();
+                    const latitude = parseFloat(issData.iss_position.latitude);
+                    const longitude = parseFloat(issData.iss_position.longitude);
+
+                    // Fetch timezone data for the ISS location
+                    const timeZoneResponse = await fetch(
+                        `http://api.geonames.org/timezoneJSON?lat=${latitude}&lng=${longitude}&username=novaproton`
+                    );
+                    const timeZoneData = await timeZoneResponse.json();
+
+                    // Return local time at the ISS location
+                    return `${timeZoneData.time}`;
+                } catch (error) {
+                    console.error('Error fetching ISS time:', error);
+                    return 'Error fetching ISS time';
+                }
+            }
+        },
+        {
             id: 'julianDate',
             name: 'Julian Date',
             info: 'The Julian date, which represents the continuous count of days since the beginning of the Julian Period.',
@@ -238,23 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // Generate tiles dynamically
-    tiles.forEach(tile => {
+    tiles.forEach(async (tile) => {
         const tileDiv = document.createElement('div');
         tileDiv.className = 'tile';
-        tileDiv.textContent = `${tile.name}: ${tile.func()}`;
-        tileDiv.addEventListener('click', () => {
+        const result = tile.func instanceof Function ? await tile.func() : tile.func;
+        tileDiv.textContent = `${tile.name}: ${result}`;
+        tileDiv.addEventListener('click', async () => {
             modal.classList.remove('hidden');
             modalTitle.textContent = tile.name;
             modalDescription.textContent = tile.info;
 
-            // Remove any existing "More Info" buttons
             const existingLinkButton = document.querySelector('#modal a');
             if (existingLinkButton) {
                 existingLinkButton.remove();
             }
 
-            // Add the "More Info" button if the tile has a link
             if (tile.link) {
                 const linkButton = document.createElement('a');
                 linkButton.href = tile.link;
@@ -267,16 +292,20 @@ document.addEventListener('DOMContentLoaded', () => {
             codeSnippet.textContent = tile.func.toString();
         });
 
-
         gridContainer.appendChild(tileDiv);
     });
 
+
     // Update tiles every second
-    setInterval(() => {
-        gridContainer.childNodes.forEach((child, index) => {
-            child.textContent = `${tiles[index].name}: ${tiles[index].func()}`;
-        });
+    setInterval(async () => {
+        const children = gridContainer.childNodes;
+        for (let i = 0; i < tiles.length; i++) {
+            const tile = tiles[i];
+            const result = tile.func instanceof Function ? await tile.func() : tile.func;
+            children[i].textContent = `${tile.name}: ${result}`;
+        }
     }, 1000);
+
 
     // Close modal functionality
     closeModal.addEventListener('click', () => {
