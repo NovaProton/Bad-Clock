@@ -179,19 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
             link: 'https://time.is/ISS',
             func: async function () {
                 try {
-                    // Fetch ISS location
-                    const issResponse = await fetch('https://api.open-notify.org/iss-now.json');
+                    // Fetch ISS location using HTTPS
+                    const issResponse = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                     const issData = await issResponse.json();
-                    const latitude = parseFloat(issData.iss_position.latitude);
-                    const longitude = parseFloat(issData.iss_position.longitude);
 
-                    // Fetch timezone data for the ISS location
+                    // Extract coordinates
+                    const latitude = parseFloat(issData.latitude);  // Changed from iss_position.latitude
+                    const longitude = parseFloat(issData.longitude); // Changed from iss_position.longitude
+
+                    // Fetch timezone data (update this URL to HTTPS if available)
                     const timeZoneResponse = await fetch(
                         `https://api.geonames.org/timezoneJSON?lat=${latitude}&lng=${longitude}&username=novaproton`
                     );
                     const timeZoneData = await timeZoneResponse.json();
 
-                    // Return local time at the ISS location
                     return `${timeZoneData.time}`;
                 } catch (error) {
                     console.error('Error fetching ISS time:', error);
