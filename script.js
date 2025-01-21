@@ -173,42 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         {
-            id: 'isstime',
-            name: 'ISS Local Time',
-            info: 'Local time at the location below the International Space Station',
-            link: 'https://www.issnationallab.org/about/iss-tracking/',
-            func: async function () {
-                try {
-                    // 1. Get ISS coordinates (single API call)
-                    const issRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
-                    if (!issRes.ok) throw new Error("ISS API failed");
-                    const { latitude, longitude } = await issRes.json();
-
-                    // 2. Calculate local time from coordinates (no additional API call)
-                    const now = new Date();
-                    const localTime = this.calculateLocalTime(latitude, longitude, now);
-
-                    return localTime;
-                } catch (error) {
-                    console.error('Error:', error);
-                    return 'Temporarily unavailable';
-                }
-            },
-            calculateLocalTime: function (lat, lng, date) {
-                // Simple timezone approximation using longitude
-                const hoursOffset = Math.round(lng / 15); // 15° longitude = 1 hour
-                const localTime = new Date(date.getTime() + (hoursOffset * 60 * 60 * 1000));
-
-                return localTime.toLocaleTimeString('en-US', {
-                    timeZone: 'UTC',
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                }) + ` (UTC${hoursOffset >= 0 ? '+' : ''}${hoursOffset})`;
-            }
-        },
-        {
             id: 'julianDate',
             name: 'Julian Date',
             info: 'The Julian date, which represents the continuous count of days since the beginning of the Julian Period.',
@@ -256,6 +220,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (phaseFraction < 0.72) return 'Waning Gibbous';
                 if (phaseFraction < 0.78) return 'Last Quarter';
                 return 'Waning Crescent';
+            }
+        },
+        {
+            id: 'isstime',
+            name: 'ISS Local Time',
+            info: 'Local time at the location below the International Space Station',
+            link: 'https://www.issnationallab.org/about/iss-tracking/',
+            func: async function () {
+                try {
+                    // 1. Get ISS coordinates (single API call)
+                    const issRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+                    if (!issRes.ok) throw new Error("ISS API failed");
+                    const { latitude, longitude } = await issRes.json();
+
+                    // 2. Calculate local time from coordinates (no additional API call)
+                    const now = new Date();
+                    const localTime = this.calculateLocalTime(latitude, longitude, now);
+
+                    return localTime;
+                } catch (error) {
+                    console.error('Error:', error);
+                    return 'Temporarily unavailable';
+                }
+            },
+            calculateLocalTime: function (lat, lng, date) {
+                // Simple timezone approximation using longitude
+                const hoursOffset = Math.round(lng / 15); // 15° longitude = 1 hour
+                const localTime = new Date(date.getTime() + (hoursOffset * 60 * 60 * 1000));
+
+                return localTime.toLocaleTimeString('en-US', {
+                    timeZone: 'UTC',
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }) + ` (UTC${hoursOffset >= 0 ? '+' : ''}${hoursOffset})`;
             }
         }
     ];
