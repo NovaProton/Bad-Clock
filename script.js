@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Fetch timezone data for the ISS location
                     const timeZoneResponse = await fetch(
-                        `http://api.geonames.org/timezoneJSON?lat=${latitude}&lng=${longitude}&username=novaproton`
+                        `https://api.geonames.org/timezoneJSON?lat=${latitude}&lng=${longitude}&username=novaproton`
                     );
                     const timeZoneData = await timeZoneResponse.json();
 
