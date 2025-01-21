@@ -174,30 +174,38 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             id: 'isstime',
-            name: 'ISS Geographical Time',
-            info: 'The local time at the location currently below the ISS.',
-            link: 'https://time.is/ISS',
+            name: 'ISS Local Time',
+            info: 'Local time at the location below the International Space Station',
+            link: 'https://www.issnationallab.org/about/iss-tracking/',
             func: async function () {
                 try {
-                    // Fetch ISS location using HTTPS
-                    const issResponse = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
-                    const issData = await issResponse.json();
+                    // 1. Get ISS coordinates (single API call)
+                    const issRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+                    if (!issRes.ok) throw new Error("ISS API failed");
+                    const { latitude, longitude } = await issRes.json();
 
-                    // Extract coordinates
-                    const latitude = parseFloat(issData.latitude);  // Changed from iss_position.latitude
-                    const longitude = parseFloat(issData.longitude); // Changed from iss_position.longitude
+                    // 2. Calculate local time from coordinates (no additional API call)
+                    const now = new Date();
+                    const localTime = this.calculateLocalTime(latitude, longitude, now);
 
-                    // Fetch timezone data (update this URL to HTTPS if available)
-                    const timeZoneResponse = await fetch(
-                        `https://api.geonames.org/timezoneJSON?lat=${latitude}&lng=${longitude}&username=novaproton`
-                    );
-                    const timeZoneData = await timeZoneResponse.json();
-
-                    return `${timeZoneData.time}`;
+                    return localTime;
                 } catch (error) {
-                    console.error('Error fetching ISS time:', error);
-                    return 'Error fetching ISS time';
+                    console.error('Error:', error);
+                    return 'Temporarily unavailable';
                 }
+            },
+            calculateLocalTime: function (lat, lng, date) {
+                // Simple timezone approximation using longitude
+                const hoursOffset = Math.round(lng / 15); // 15° longitude = 1 hour
+                const localTime = new Date(date.getTime() + (hoursOffset * 60 * 60 * 1000));
+
+                return localTime.toLocaleTimeString('en-US', {
+                    timeZone: 'UTC',
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }) + ` (UTC${hoursOffset >= 0 ? '+' : ''}${hoursOffset})`;
             }
         },
         {
