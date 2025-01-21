@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             func: async function () {
                 try {
                     // Fetch ISS location
-                    const issResponse = await fetch('http://api.open-notify.org/iss-now.json');
+                    const issResponse = await fetch('https://api.open-notify.org/iss-now.json');
                     const issData = await issResponse.json();
                     const latitude = parseFloat(issData.iss_position.latitude);
                     const longitude = parseFloat(issData.iss_position.longitude);
