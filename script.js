@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (jdAtMidnight + fractionOfDay).toFixed(5);
             }
         },
-                {
+        {
             id: 'excelSerial',
             name: 'Excel Serial Date',
             info: 'The current date and time as a spreadsheet serial number (1900 date system): whole days since 30 December 1899, with the time of day as a fraction. Paste it into Excel or Google Sheets and format the cell as a date to read it back.',
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (localMs / 86400000 + 25569).toFixed(5);
             }
         },
-                {
+        {
             id: 'marsTime',
             name: 'Mars Coordinated Time',
             info: 'The Mars Sol Date (days since a reference date in 1873) and Coordinated Mars Time, the Martian equivalent of UTC at the prime meridian. A sol lasts about 24h 39m 35s.',
@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `Sol ${Math.floor(msd)}, ${p(Math.floor(secs / 3600))}:${p(Math.floor(secs / 60) % 60)}:${p(secs % 60)}`;
             }
         },
-                {
+        {
             id: 'y2038',
             name: 'Y2038 Countdown',
             info: 'Seconds until signed 32-bit Unix time overflows (2,147,483,647 seconds after the epoch), at 03:14:07 UTC on 19 January 2038.',
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `${left.toLocaleString('en-GB')} s`;
             }
         },
-                {
+        {
             id: 'hexTime',
             name: 'Hexadecimal Time',
             info: 'The day divided into 16 hexadecimal hours, each of 256 hex minutes, each of 16 hex seconds. Midnight is 0_00_0 and midday is 8_00_0.',
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </g>`;
             }
         },
-                {
+        {
             id: 'romanTime',
             name: 'Roman Time',
             info: 'The time in Roman numerals. The Romans had no zero, so medieval scholars used N (nulla) instead.',
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `${roman(now.getHours())} : ${roman(now.getMinutes())} : ${roman(now.getSeconds())}`;
             }
         },
-                {
+        {
             id: 'morseTime',
             name: 'Morse Time',
             info: 'Hours, minutes and seconds in International Morse Code, one per line.',
@@ -395,7 +395,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     .join('\n');
             }
         },
-                {
+        {
+            id: 'binaryTime',
+            name: 'Binary Clock',
+            info: 'Hours, minutes and seconds in binary, one per line. Each line has six bits worth 32, 16, 8, 4, 2 and 1 from left to right; add up the places with a 1. Six bits count to 63, which covers every hour, minute and second.',
+            link: 'https://en.wikipedia.org/wiki/Binary_clock',
+            mono: true, // fixed-width font and line breaks, like Morse
+            func: function () {
+                const now = getNow();
+                return [now.getHours(), now.getMinutes(), now.getSeconds()]
+                    .map(n => n.toString(2).padStart(6, '0'))
+                    .join('\n');
+            }
+        },
+
+        {
             id: 'planckTime',
             name: 'Planck Times Since Midnight',
             info: 'Planck times elapsed since midnight. One Planck time is about 5.39 × 10⁻⁴⁴ seconds, the shortest interval that makes physical sense.',
@@ -406,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (secs / 5.391247e-44).toExponential(4);
             }
         },
-                {
+        {
             id: 'lightDistance',
             name: 'Light Since Midnight',
             info: 'How far light emitted at midnight has travelled, in astronomical units (1 AU = Earth–Sun distance). It reaches Neptune (about 30 AU) shortly after 4am.',
@@ -417,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `${(secs * 299792.458 / 149597870.7).toFixed(3)} AU`;
             }
         },
-                {
+        {
             id: 'medievalTime',
             name: 'Medieval Time',
             info: 'The monastic canonical hour, plus moments elapsed in the current hour. A moment (momentum) was a medieval unit of 1/40 of an hour, or 90 seconds.',
@@ -853,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locationButton.addEventListener('click', findLocation);
         navigator.permissions?.query({ name: 'geolocation' })
             .then(status => { if (status.state === 'granted') findLocation(); })
-            .catch(() => {});
+            .catch(() => { });
     } else {
         locationButton.hidden = true;
         locationText.textContent = "This browser can't share a location. Sundial set for Greenwich.";
