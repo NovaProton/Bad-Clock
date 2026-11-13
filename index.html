@@ -25,10 +25,35 @@
     <h1>Bad Clock</h1>
     <p class="lede">The time, told <span id="tileCount">many</span> ways. Most of them are unhelpful.</p>
     <p class="readout"><time id="readout"></time></p>
-    <p class="location">
-      <span id="locationText">Sundial set for Greenwich.</span>
-      <button type="button" id="locationButton" class="link-button">Use my location</button>
-    </p>
+  </div>
+
+  <!-- Icon buttons. Each one's label (data-tip) shows as a tooltip and is
+       read out by screen readers; script.js keeps the location one up to date. -->
+  <div class="tools" role="toolbar" aria-label="Options">
+    <button type="button" id="locationButton" class="icon-btn"
+            data-tip="Sundial set for Greenwich. Use my location"
+            aria-label="Sundial set for Greenwich. Use my location">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="7"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        <circle class="fill" cx="12" cy="12" r="2"/>
+      </svg>
+    </button>
+    <button type="button" id="pickButton" class="icon-btn" aria-pressed="false"
+            data-tip="Show tiles side by side" aria-label="Show tiles side by side">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="7.5" height="7.5" rx="1"/>
+        <rect x="13.5" y="3" width="7.5" height="7.5" rx="1"/>
+        <rect x="3" y="13.5" width="7.5" height="7.5" rx="1"/>
+        <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1"/>
+      </svg>
+    </button>
+    <button type="button" id="shuffleButton" class="icon-btn"
+            data-tip="Shuffle through the tiles full page" aria-label="Shuffle through the tiles full page">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 7h3c2.2 0 3.4 1.2 4.5 3l3 4c1.1 1.8 2.3 3 4.5 3h3M3 17h3c2.2 0 3.4-1.2 4.5-3M13.5 10c1.1-1.8 2.3-3 4.5-3h3M18 4l3 3-3 3M18 14l3 3-3 3"/>
+      </svg>
+    </button>
   </div>
 
   <div class="time-travel">
@@ -75,15 +100,29 @@
     <h2 id="focusName" class="focus-name"></h2>
     <button type="button" id="focusClose" class="btn">Back to all tiles</button>
   </div>
-  <div id="focusStage" class="focus-stage">
-    <svg id="focusIcon" class="focus-icon" viewBox="0 0 32 32" aria-hidden="true" hidden></svg>
-    <span id="focusValue" class="focus-value"></span>
-  </div>
+  <!-- One pane per tile shown (up to 4), built by script.js from the template below -->
+  <div id="focusStage" class="focus-stage"></div>
   <div class="focus-foot">
     <p id="focusReadout" class="focus-readout"></p>
-    <p class="key-hint">Use ← and → to change tile</p>
+    <p id="focusHint" class="key-hint">Use ← and → to change tile</p>
   </div>
 </dialog>
+
+<template id="paneTemplate">
+  <div class="pane">
+    <svg class="focus-icon" viewBox="0 0 32 32" aria-hidden="true" hidden></svg>
+    <span class="focus-value"></span>
+  </div>
+</template>
+
+<!-- Shown while picking tiles to put side by side -->
+<div id="pickBar" class="pick-bar" hidden>
+  <p id="pickCount" class="pick-count" aria-live="polite"></p>
+  <div class="pick-actions">
+    <button type="button" id="pickCancel" class="btn">Cancel</button>
+    <button type="button" id="pickShow" class="btn btn-primary" disabled>Show full page</button>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
