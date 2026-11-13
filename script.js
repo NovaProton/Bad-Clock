@@ -210,6 +210,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (localMs / 86400000 + 25569).toFixed(5);
             }
         },
+                {
+            id: 'marsTime',
+            name: 'Mars Coordinated Time',
+            info: 'The Mars Sol Date (days since a reference date in 1873) and Coordinated Mars Time, the Martian equivalent of UTC at the prime meridian. A sol lasts about 24h 39m 35s.',
+            link: 'https://en.wikipedia.org/wiki/Timekeeping_on_Mars',
+            func: function () {
+                const jdUTC = Date.now() / 86400000 + 2440587.5;
+                const jdTT = jdUTC + (37 + 32.184) / 86400;
+                const msd = (jdTT - 2405522.0028779) / 1.0274912517;
+                const secs = Math.floor((msd % 1) * 86400);
+                const p = n => String(n).padStart(2, '0');
+                return `Sol ${Math.floor(msd)}, ${p(Math.floor(secs / 3600))}:${p(Math.floor(secs / 60) % 60)}:${p(secs % 60)}`;
+            }
+        },
+                {
+            id: 'y2038',
+            name: 'Y2038 Countdown',
+            info: 'Seconds until signed 32-bit Unix time overflows (2,147,483,647 seconds after the epoch), at 03:14:07 UTC on 19 January 2038.',
+            link: 'https://en.wikipedia.org/wiki/Year_2038_problem',
+            func: function () {
+                const left = 2147483647 - Math.floor(Date.now() / 1000);
+                return `${left.toLocaleString('en-GB')} s`;
+            }
+        },
+                {
+            id: 'hexTime',
+            name: 'Hexadecimal Time',
+            info: 'The day divided into 16 hexadecimal hours, each of 256 hex minutes, each of 16 hex seconds. Midnight is 0_00_0 and midday is 8_00_0.',
+            link: 'https://en.wikipedia.org/wiki/Hexadecimal_time',
+            func: function () {
+                const now = new Date();
+                const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+                const h = Math.floor(secs / 86400 * 65536).toString(16).toUpperCase().padStart(4, '0');
+                return `${h[0]}_${h.slice(1, 3)}_${h[3]}`;
+            }
+        },
         {
             id: 'moonPhase',
             name: 'Moon Phase',
