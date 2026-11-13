@@ -515,13 +515,19 @@ main {
 /* The dialogs take focus themselves when they open; no ring needed on them. */
 .modal:focus, .focus-view:focus { outline: none; }
 
-.focus-readout {
+.focus-foot {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
     padding: 0 1.5rem 1.25rem;
+}
+.focus-readout {
+    margin: 0;
     font-family: var(--font-display);
     font-weight: 500;
     font-size: 1.0625rem;
@@ -534,4 +540,24 @@ main {
 
 @media (prefers-reduced-motion: no-preference) {
     .focus-view[open] { animation: modal-in 160ms ease-out; }
+}
+
+/* Arrow-key hint: only on devices with a keyboard and pointer. */
+.key-hint {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+}
+@media (hover: none) {
+    .key-hint { display: none; }
+}
+
+/* Full page: fade out the name, buttons and date when nobody's using the
+   mouse or keyboard, leaving just the time. */
+.focus-bar, .focus-foot { transition: opacity 400ms ease; }
+.focus-view.is-idle { cursor: none; }
+.focus-view.is-idle .focus-bar,
+.focus-view.is-idle .focus-foot { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+    .focus-bar, .focus-foot { transition: none; }
 }

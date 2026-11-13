@@ -703,8 +703,11 @@ document.addEventListener('DOMContentLoaded', () => {
         focusView.classList.toggle('is-mono', Boolean(tile.mono));
         fittedFor = '';
         if (modal.open) modal.close();
-        focusView.showModal();
-        focusView.focus(); // focus the view itself, not the first button (no stray focus ring)
+        if (!focusView.open) {
+            focusView.showModal();
+            focusView.focus(); // focus the view itself, not the first button (no stray focus ring)
+        }
+        wake();
         updateFocus();
         updateAddress();
     }
@@ -768,11 +771,25 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => { if (focusTile) { fittedFor = ''; updateFocus(); } });
 
     document.getElementById('focusClose').addEventListener('click', () => focusView.close());
+    // After 3 seconds without the mouse, keyboard or touch, fade out everything
+    // except the time (and hide the cursor). Any of them brings it all back.
+    const IDLE_MS = 3000;
+    let idleTimer;
+    function wake() {
+        focusView.classList.remove('is-idle');
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => focusView.classList.add('is-idle'), IDLE_MS);
+    }
+    ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(type =>
+        focusView.addEventListener(type, wake, { passive: true }));
+
     focusView.addEventListener('close', () => {
         const tile = focusTile;
+        clearTimeout(idleTimer);
+        focusView.classList.remove('is-idle');
         focusTile = null;
         updateAddress();
-        if (tile) tile.el.focus(); // put keyboard focus back on the tile it came from
+        if (tile) tile.el.focus({ focusVisible: true }); // highlight the tile you were last viewing
     });
 
     // Opened with ?t=… in the address? Start frozen at that moment.
@@ -840,9 +857,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tell the CSS how many rows of tiles there are, so it can cap their
     // height on big screens. Re-checked whenever the grid changes size.
+    const columnCount = () => getComputedStyle(gridContainer).gridTemplateColumns.split(' ').length;
     const countRows = () => {
-        const columns = getComputedStyle(gridContainer).gridTemplateColumns.split(' ').length;
-        gridContainer.style.setProperty('--rows', Math.ceil(tiles.length / columns));
+        gridContainer.style.setProperty('--rows', Math.ceil(tiles.length / columnCount()));
     };
     new ResizeObserver(countRows).observe(gridContainer);
 
@@ -857,9 +874,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tile.link) modalLink.href = tile.link;
         codeSnippet.textContent = dedent(tile.func.toString());
         copyCodeButton.textContent = 'Copy code';
-        modal.showModal();
-        modal.focus();
+        codeSnippet.parentElement.scrollTo(0, 0); // start each tile's code at the top
+        if (!modal.open) {
+            modal.showModal();
+            modal.focus();
+        }
     }
+
+    // ---- Arrow keys --------------------------------------------------------
+    // In the pop-up or the full page view, ← and → move to the previous or
+    // next tile, looping round at the ends. On the grid, all four arrows move
+    // between tiles, with ↑ and ↓ jumping a whole row.
+    const neighbour = (tile, step) => tiles[(tiles.indexOf(tile) + step + tiles.length) % tiles.length];
+    const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+
+    document.addEventListener('keydown', (event) => {
+        if (!ARROWS.includes(event.key)) return;
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        // Leave the arrows alone where they already do something: scrolling
+        // the code box, or changing the date and time in the picker.
+        if (event.target.closest && event.target.closest('pre, input, textarea, select')) return;
+
+        if (focusView.open || modal.open) {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            const step = event.key === 'ArrowRight' ? 1 : -1;
+            event.preventDefault();
+            if (focusView.open && focusTile) openFocus(neighbour(focusTile, step));
+            else if (currentTile) openModal(neighbour(currentTile, step));
+            return;
+        }
+
+        // On the grid.
+        const index = tiles.findIndex(t => t.el === document.activeElement);
+        if (index === -1) {
+            // Nothing picked yet: the first arrow press lands on the first tile.
+            if (event.target === document.body) {
+                event.preventDefault();
+                tiles[0].el.focus();
+            }
+            return;
+        }
+        const columns = columnCount();
+        const move = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -columns, ArrowDown: columns }[event.key];
+        const next = index + move;
+        if (next < 0 || next >= tiles.length) return; // at the edge: let the page scroll as normal
+        event.preventDefault();
+        tiles[next].el.focus();
+        tiles[next].el.scrollIntoView({ block: 'nearest' });
+    });
 
     // toString() keeps the indentation from inside the tiles array; strip it
     // from every line after the first so the code sits flush left.
@@ -871,6 +933,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeModal.addEventListener('click', () => modal.close());
+
+    // Closing the pop-up: highlight the tile you were last looking at (arrow
+    // keys may have moved on from the one you opened), as full page does.
+    // Skipped when the pop-up closed to open the full page view.
+    modal.addEventListener('close', () => {
+        if (currentTile && !focusView.open) {
+            currentTile.el.focus({ focusVisible: true });
+            currentTile.el.scrollIntoView({ block: 'nearest' });
+        }
+    });
     document.getElementById('fullPageButton').addEventListener('click', () => {
         if (currentTile) openFocus(currentTile);
     });
