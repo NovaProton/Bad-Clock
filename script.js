@@ -712,8 +712,8 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             (err) => {
                 locationText.textContent = err.code === err.PERMISSION_DENIED
-                    ? 'Location is blocked for this page, so the sundial uses Greenwich.'
-                    : "Couldn't find your location, so the sundial uses Greenwich.";
+                    ? 'Location is blocked. Sundial set for Greenwich.'
+                    : "Couldn't find your location. Sundial set for Greenwich.";
                 locationButton.textContent = 'Try again';
                 locationButton.disabled = false;
             },
@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => {});
     } else {
         locationButton.hidden = true;
-        locationText.textContent = "This browser can't share a location, so the sundial uses Greenwich.";
+        locationText.textContent = "This browser can't share a location. Sundial set for Greenwich.";
     }
 
     // Tell the CSS how many rows of tiles there are, so it can cap their

@@ -379,10 +379,43 @@ main {
     .time-travel { grid-column: 1 / -1; justify-self: start; }
 }
 
+/* Phones: clock beside the title and tagline, then the date, location and
+   time picker each on their own full-width line underneath. */
 @media (max-width: 640px) {
-    .masthead { padding-top: 1rem; gap: 1rem; }
-    .dial { width: 4.5rem; }
-    h1 { font-size: 2rem; }
+    .masthead {
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "dial     title"
+            "dial     lede"
+            "readout  readout"
+            "location location"
+            "travel   travel";
+        column-gap: 1rem;
+        row-gap: 0;
+        padding: 1.25rem 1rem 1rem;
+    }
+    .masthead-text { display: contents; } /* lets its children join the grid above */
+
+    .dial { grid-area: dial; width: 4.5rem; }
+    h1 { grid-area: title; align-self: end; font-size: 2rem; margin: 0 0 0.125rem; }
+    .lede { grid-area: lede; align-self: start; font-size: 0.9375rem; line-height: 1.35; }
+
+    .readout {
+        grid-area: readout;
+        margin-top: 1rem;
+        padding-top: 0.875rem;
+        border-top: 1px solid var(--rule);
+    }
+    .location { grid-area: location; }
+
+    .time-travel { grid-area: travel; justify-self: stretch; margin-top: 1rem; }
+    .time-travel-row { flex-direction: column; }
+    .time-travel input,
+    .time-travel .btn { width: 100%; }
+    #timeNowButton:disabled { display: none; } /* only show it once the clock is frozen */
+    .time-status { max-width: none; }
+
+    main { padding: 0 1rem 1rem; }
     .grid { grid-template-columns: 1fr 1fr; }
     .modal-inner { padding: 1.125rem; }
 }
