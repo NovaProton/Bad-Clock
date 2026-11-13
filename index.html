@@ -1,23 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bad Clock With Code</title>
+  <title>Bad Clock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="grid" id="gridContainer"></div>
 
-<div id="modal" class="modal hidden">
-  <div class="modal-content">
-    <h2 id="modalTitle"></h2>
-    <p id="modalDescription"></p>
-    <pre><code id="codeSnippet"></code></pre>
-    <button id="copyCodeButton">Copy Code</button>
+<header class="masthead">
+  <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+    <circle class="dial-face" cx="100" cy="100" r="96"/>
+    <g id="dialTicks"></g>
+    <line id="hourHand" class="hand hand-hour" x1="100" y1="114" x2="100" y2="52"/>
+    <line id="minuteHand" class="hand hand-minute" x1="100" y1="116" x2="100" y2="26"/>
+    <line id="secondHand" class="hand hand-second" x1="100" y1="128" x2="100" y2="18"/>
+    <circle class="hub" cx="100" cy="100" r="4.5"/>
+  </svg>
+
+  <div class="masthead-text">
+    <h1>Bad Clock</h1>
+    <p class="lede">The time, told <span id="tileCount">many</span> ways. Most of them are unhelpful.</p>
+    <p class="readout"><time id="readout"></time></p>
+    <p class="location">
+      <span id="locationText">The sundial is set for Greenwich.</span>
+      <button type="button" id="locationButton" class="link-button">Use my location</button>
+    </p>
   </div>
-  <button id="closeModal">Close</button>
-</div>
+
+  <div class="time-travel">
+      <label for="timeInput">Show the clock at</label>
+      <div class="time-travel-row">
+        <input type="datetime-local" id="timeInput" step="1">
+        <button type="button" id="timeNowButton" class="btn" disabled>Back to now</button>
+      </div>
+      <p id="timeStatus" class="time-status">Showing the live time. Click a tile to see how it works.</p>
+  </div>
+</header>
+
+<main>
+  <div class="grid" id="gridContainer"></div>
+</main>
+
+<dialog id="modal" class="modal" aria-labelledby="modalTitle">
+  <div class="modal-inner">
+    <div class="modal-head">
+      <h2 id="modalTitle"></h2>
+      <button type="button" id="closeModal" class="btn btn-quiet">Close</button>
+    </div>
+    <p id="modalDescription"></p>
+    <a id="modalLink" class="modal-link" target="_blank" rel="noopener">Read more about it</a>
+    <div class="code-block">
+      <div class="code-bar">
+        <span>How it's worked out</span>
+        <div class="code-actions">
+          <button type="button" id="copyTimeButton" class="btn">Copy time</button>
+          <button type="button" id="copyCodeButton" class="btn btn-primary">Copy code</button>
+        </div>
+      </div>
+      <pre><code id="codeSnippet"></code></pre>
+    </div>
+  </div>
+</dialog>
 
 <script src="script.js"></script>
 </body>
