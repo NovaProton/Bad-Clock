@@ -269,6 +269,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 'Waning Crescent';
             }
         },
+                {
+            id: 'romanTime',
+            name: 'Roman Time',
+            info: 'The time in Roman numerals. The Romans had no zero, so medieval scholars used N (nulla) instead.',
+            link: 'https://en.wikipedia.org/wiki/Roman_numerals',
+            func: function () {
+                const roman = n => {
+                    if (n === 0) return 'N';
+                    const map = [[50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+                    let out = '';
+                    for (const [v, r] of map) while (n >= v) { out += r; n -= v; }
+                    return out;
+                };
+                const now = new Date();
+                return `${roman(now.getHours())} : ${roman(now.getMinutes())} : ${roman(now.getSeconds())}`;
+            }
+        },
+                {
+            id: 'morseTime',
+            name: 'Morse Time',
+            info: 'Hours and minutes in International Morse Code.',
+            link: 'https://en.wikipedia.org/wiki/Morse_code',
+            func: function () {
+                const m = ['-----', '.----', '..---', '...--', '....-', '.....', '-....', '--...', '---..', '----.'];
+                const now = new Date();
+                const t = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+                return [...t].map(d => m[d]).join(' ').replace(/^(\S+ \S+) /, '$1 / ');
+            }
+        },
+                {
+            id: 'planckTime',
+            name: 'Planck Times Since Midnight',
+            info: 'Planck times elapsed since midnight. One Planck time is about 5.39 × 10⁻⁴⁴ seconds, the shortest interval that makes physical sense.',
+            link: 'https://en.wikipedia.org/wiki/Planck_units#Planck_time',
+            func: function () {
+                const now = new Date();
+                const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000;
+                return (secs / 5.391247e-44).toExponential(4);
+            }
+        },
+                {
+            id: 'lightDistance',
+            name: 'Light Since Midnight',
+            info: 'How far light emitted at midnight has travelled, in astronomical units (1 AU = Earth–Sun distance). It reaches Neptune (about 30 AU) shortly after 4am.',
+            link: 'https://en.wikipedia.org/wiki/Light-second',
+            func: function () {
+                const now = new Date();
+                const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+                return `${(secs * 299792.458 / 149597870.7).toFixed(3)} AU`;
+            }
+        },
+                {
+            id: 'medievalTime',
+            name: 'Medieval Time',
+            info: 'The monastic canonical hour, plus moments elapsed in the current hour. A moment (momentum) was a medieval unit of 1/40 of an hour, or 90 seconds.',
+            link: 'https://en.wikipedia.org/wiki/Moment_(time)',
+            func: function () {
+                const hours = ['Matins', 'Lauds', 'Prime', 'Terce', 'Sext', 'None', 'Vespers', 'Compline'];
+                const now = new Date();
+                const moments = Math.floor((now.getMinutes() * 60 + now.getSeconds()) / 90);
+                return `${hours[Math.floor(now.getHours() / 3)]}, ${moments} moments past the hour`;
+            }
+        },
         {
             id: 'isstime',
             name: 'ISS Local Time',
