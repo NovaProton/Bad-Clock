@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'isstime',
             name: 'ISS Local Time',
             info: 'Local time at the location below the International Space Station',
-            link: 'https://www.issnationallab.org/about/iss-tracking/',
+            link: 'https://isstracker.spaceflight.esa.int/index_portal.php',
             func: async function () {
                 try {
                     // 1. Get ISS coordinates (single API call)
