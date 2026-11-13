@@ -542,15 +542,18 @@ main {
     .focus-view[open] { animation: modal-in 160ms ease-out; }
 }
 
-/* Arrow-key hint: only on devices with a keyboard and pointer. */
+/* Arrow-key hint: only on devices with a keyboard and pointer. Phones don't
+   always say they can't hover, so also check for a touch screen, a narrow
+   screen, and (from script.js) whether the screen has been touched. */
 .key-hint {
     margin: 0;
     font-size: 0.875rem;
     color: var(--ink-soft);
 }
-@media (hover: none) {
+@media (hover: none), (pointer: coarse), (max-width: 640px) {
     .key-hint { display: none; }
 }
+.is-touch .key-hint { display: none; }
 
 /* Full page: fade out the name, buttons and date when nobody's using the
    mouse or keyboard, leaving just the time. */

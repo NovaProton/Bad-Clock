@@ -1,3 +1,7 @@
+// The first touch marks this as a touch device, which hides the arrow-key hints.
+window.addEventListener('touchstart', () => document.documentElement.classList.add('is-touch'),
+    { once: true, passive: true });
+
 document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.getElementById('gridContainer');
     const modal = document.getElementById('modal');
