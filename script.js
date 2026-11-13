@@ -199,6 +199,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (jdAtMidnight + fractionOfDay).toFixed(5);
             }
         },
+                {
+            id: 'excelSerial',
+            name: 'Excel Serial Date',
+            info: 'The current date and time as a spreadsheet serial number (1900 date system): whole days since 30 December 1899, with the time of day as a fraction. Paste it into Excel or Google Sheets and format the cell as a date to read it back.',
+            link: 'https://support.microsoft.com/en-gb/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487',
+            func: function () {
+                const now = new Date();
+                const localMs = now.getTime() - now.getTimezoneOffset() * 60000;
+                return (localMs / 86400000 + 25569).toFixed(5);
+            }
+        },
         {
             id: 'moonPhase',
             name: 'Moon Phase',
