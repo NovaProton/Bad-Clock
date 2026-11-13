@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
                 const bielTime = new Date(utcTime + 3600000);
                 const totalSeconds = bielTime.getUTCHours() * 3600 + bielTime.getUTCMinutes() * 60 + bielTime.getUTCSeconds();
-                const beats = Math.floor((totalSeconds / 86400) * 1000);
+                const beats = Math.floor(((Date.now() + 3600000) % 86400000) / 86400);
                 return `@${beats}`;
             }
         },
@@ -330,6 +330,113 @@ document.addEventListener('DOMContentLoaded', () => {
                 const now = new Date();
                 const moments = Math.floor((now.getMinutes() * 60 + now.getSeconds()) / 90);
                 return `${hours[Math.floor(now.getHours() / 3)]}, ${moments} moments past the hour`;
+            }
+        },
+        // Drop these into the `tiles` array.
+
+        {
+            id: 'shipsBells',
+            name: "Ship's Bells",
+            info: "Time as rung aboard ship: one bell per half hour of a four-hour watch, up to eight bells at the change of watch. The 16:00–20:00 watch is split into two dog watches so crews rotate.",
+            link: 'https://en.wikipedia.org/wiki/Ship%27s_bell',
+            func: function () {
+                const now = new Date();
+                const h = now.getHours();
+                const bells = Math.floor((h * 60 + now.getMinutes()) / 30) % 8 || 8;
+                const watch = h < 4 ? 'Middle' : h < 8 ? 'Morning' : h < 12 ? 'Forenoon' : h < 16 ? 'Afternoon'
+                    : h < 18 ? 'First Dog' : h < 20 ? 'Last Dog' : 'First';
+                return `${bells} bell${bells > 1 ? 's' : ''}, ${watch} Watch`;
+            }
+        },
+        {
+            id: 'mayanLongCount',
+            name: 'Mayan Long Count',
+            info: "Days since the Maya creation date (11 August 3114 BC), written as baktun.katun.tun.uinal.kin. The famous 13.0.0.0.0 fell on 21 December 2012. Uses the GMT correlation (584283).",
+            link: 'https://en.wikipedia.org/wiki/Mesoamerican_Long_Count_calendar',
+            func: function () {
+                let d = Math.floor(Date.now() / 86400000) + 2440588 - 584283;
+                const parts = [144000, 7200, 360, 20, 1].map(n => { const v = Math.floor(d / n); d %= n; return v; });
+                return parts.join('.');
+            }
+        },
+        {
+            id: 'gpsTime',
+            name: 'GPS Time',
+            info: "GPS week number and seconds into the week, counted from 6 January 1980. GPS ignores leap seconds, so it currently runs 18 seconds ahead of UTC. Older receivers only store the week in 10 bits, which rolls over every 1,024 weeks.",
+            link: 'https://en.wikipedia.org/wiki/GPS_week_number_rollover',
+            func: function () {
+                const gps = Math.floor(Date.now() / 1000) - 315964800 + 18;
+                const week = Math.floor(gps / 604800);
+                return `Week ${week} (${week % 1024}), ${(gps % 604800).toLocaleString('en-GB')} s`;
+            }
+        },
+        {
+            id: 'sundialTime',
+            name: 'Sundial Time',
+            info: "Apparent solar time: what a sundial would read. It drifts from clock time because Earth's orbit is elliptical and its axis is tilted (the equation of time). In early November a sundial runs about 16 minutes fast.",
+            link: 'https://en.wikipedia.org/wiki/Equation_of_time',
+            func: function () {
+                const LONGITUDE = 0; // degrees east of Greenwich; set to your own
+                const now = new Date();
+                const N = Math.floor((now - Date.UTC(now.getUTCFullYear(), 0, 0)) / 86400000);
+                const B = 2 * Math.PI * (N - 81) / 365;
+                const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+                const utcMins = now.getUTCHours() * 60 + now.getUTCMinutes() + now.getUTCSeconds() / 60;
+                const solar = (utcMins + LONGITUDE * 4 + eot + 1440) % 1440;
+                const p = n => String(Math.floor(n)).padStart(2, '0');
+                return `${p(solar / 60)}:${p(solar % 60)}:${p((solar * 60) % 60)}`;
+            }
+        },
+        {
+            id: 'shichen',
+            name: 'Chinese Double-Hour',
+            info: "Traditional Chinese timekeeping split the day into 12 shichen of two hours each, named after the Earthly Branches and zodiac animals. The Rat hour starts at 23:00. Each was further divided into 8 ke of 15 minutes.",
+            link: 'https://en.wikipedia.org/wiki/Traditional_Chinese_timekeeping',
+            func: function () {
+                const names = ['Zi (Rat)', 'Chou (Ox)', 'Yin (Tiger)', 'Mao (Rabbit)', 'Chen (Dragon)', 'Si (Snake)',
+                    'Wu (Horse)', 'Wei (Goat)', 'Shen (Monkey)', 'You (Rooster)', 'Xu (Dog)', 'Hai (Pig)'];
+                const now = new Date();
+                const shifted = (now.getHours() + 1) % 24;
+                const ke = Math.floor(((shifted % 2) * 60 + now.getMinutes()) / 15) + 1;
+                return `${names[Math.floor(shifted / 2)]}, ke ${ke} of 8`;
+            }
+        },
+        {
+            id: 'halakim',
+            name: 'Hebrew Chalakim',
+            info: "In the Hebrew calendar an hour is divided into 1,080 chalakim (parts) of 3⅓ seconds each, a number chosen because it divides cleanly by 2, 3, 4, 5, 6, 8, 9 and 10.",
+            link: 'https://en.wikipedia.org/wiki/Helek',
+            func: function () {
+                const now = new Date();
+                const parts = Math.floor((now.getMinutes() * 60 + now.getSeconds()) * 0.3);
+                return `${now.getHours()} hours, ${parts} chalakim`;
+            }
+        },
+        {
+            id: 'fuzzyTime',
+            name: 'Fuzzy Time',
+            info: 'The time the way a person says it when they glance at a clock.',
+            link: 'https://en.wikipedia.org/wiki/12-hour_clock',
+            func: function () {
+                const words = ['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+                const phrases = ["{h} o'clock", 'five past {h}', 'ten past {h}', 'quarter past {h}', 'twenty past {h}', 'twenty-five past {h}',
+                    'half past {h}', 'twenty-five to {n}', 'twenty to {n}', 'quarter to {n}', 'ten to {n}', 'five to {n}', "{n} o'clock"];
+                const now = new Date();
+                const i = Math.round((now.getMinutes() + now.getSeconds() / 60) / 5);
+                const h = now.getHours() % 12;
+                const text = phrases[i].replace('{h}', words[h]).replace('{n}', words[(h + 1) % 12]);
+                return `About ${text}`;
+            }
+        },
+        {
+            id: 'orbitDistance',
+            name: 'Orbit Since Midnight',
+            info: 'How far Earth has carried you around the Sun since midnight, at an average orbital speed of 29.78 km/s.',
+            link: 'https://en.wikipedia.org/wiki/Earth%27s_orbit',
+            func: function () {
+                const now = new Date();
+                const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+                return `${Math.round(secs * 29.78).toLocaleString('en-GB')} km`;
             }
         },
         {
