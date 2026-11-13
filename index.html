@@ -45,11 +45,14 @@
   <div class="grid" id="gridContainer"></div>
 </main>
 
-<dialog id="modal" class="modal" aria-labelledby="modalTitle">
+<dialog id="modal" class="modal" aria-labelledby="modalTitle" tabindex="-1">
   <div class="modal-inner">
     <div class="modal-head">
       <h2 id="modalTitle"></h2>
-      <button type="button" id="closeModal" class="btn btn-quiet">Close</button>
+      <div class="modal-actions">
+        <button type="button" id="fullPageButton" class="btn">Full page</button>
+        <button type="button" id="closeModal" class="btn btn-quiet">Close</button>
+      </div>
     </div>
     <p id="modalDescription"></p>
     <a id="modalLink" class="modal-link" target="_blank" rel="noopener">Read more about it</a>
@@ -64,6 +67,18 @@
       <pre><code id="codeSnippet"></code></pre>
     </div>
   </div>
+</dialog>
+
+<dialog id="focusView" class="focus-view" aria-labelledby="focusName" tabindex="-1">
+  <div class="focus-bar">
+    <h2 id="focusName" class="focus-name"></h2>
+    <button type="button" id="focusClose" class="btn">Back to all tiles</button>
+  </div>
+  <div id="focusStage" class="focus-stage">
+    <svg id="focusIcon" class="focus-icon" viewBox="0 0 32 32" aria-hidden="true" hidden></svg>
+    <span id="focusValue" class="focus-value"></span>
+  </div>
+  <p id="focusReadout" class="focus-readout"></p>
 </dialog>
 
 <script src="script.js"></script>

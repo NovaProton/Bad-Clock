@@ -438,3 +438,100 @@ main {
 @media (prefers-reduced-motion: reduce) {
     .modal[open] { animation: none; }
 }
+
+/* ---- Full page view ---------------------------------------------------- */
+/* A <dialog> stretched over the whole browser window. */
+.focus-view {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+.focus-view[open] { display: block; }
+.focus-view::backdrop { background: var(--paper); }
+
+/* The name bar and date line sit on top of the stage, so the value is
+   centred on the whole page rather than in the gap between them. */
+.focus-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem 0;
+}
+.focus-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    margin: 0;
+}
+
+.focus-stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 5.5rem 1.5rem; /* the same top and bottom, clear of the bar and date */
+    overflow: hidden;
+}
+
+.focus-icon { width: clamp(4rem, 16vmin, 10rem); height: auto; flex: none; }
+.focus-icon[hidden] { display: none; }
+
+.focus-value {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.05;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    white-space: pre; /* one line, except values with their own line breaks (Morse) */
+}
+.focus-view.is-mono .focus-value {
+    font-family: var(--font-code);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0;
+}
+
+/* The dialogs take focus themselves when they open; no ring needed on them. */
+.modal:focus, .focus-view:focus { outline: none; }
+
+.focus-readout {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0 1.5rem 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+}
+.is-frozen .focus-readout { color: var(--signal); }
+
+.modal-actions { display: flex; gap: 0.25rem; flex: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .focus-view[open] { animation: modal-in 160ms ease-out; }
+}

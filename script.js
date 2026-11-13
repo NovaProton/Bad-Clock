@@ -31,13 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeStatus = document.getElementById('timeStatus');
     timeInput.value = toInputValue(new Date());
 
-    // Keep the frozen moment in the address (?t=2012-12-21T11:11:00) so it can
-    // be bookmarked or shared. replaceState doesn't add history entries.
-    function updateAddress(date) {
+    let focusTile = null; // the tile shown full page, if any
+
+    // Keep the frozen moment (?t=2012-12-21T11:11:00) and the full-page tile
+    // (?show=moonPhase) in the address so they can be bookmarked or shared.
+    // replaceState doesn't add history entries.
+    function updateAddress() {
         const url = new URL(location.href);
         url.searchParams.delete('t');
+        url.searchParams.delete('show');
+        const extra = [];
+        if (focusTile) extra.push('show=' + encodeURIComponent(focusTile.id));
         // Set by hand so the colons stay readable rather than becoming %3A.
-        if (date) url.search = (url.search ? url.search + '&' : '?') + 't=' + toInputValue(date);
+        if (timeOverride) extra.push('t=' + toInputValue(timeOverride));
+        if (extra.length) url.search = (url.search ? url.search + '&' : '?') + extra.join('&');
         try {
             history.replaceState(null, '', url);
         } catch (err) {
@@ -48,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setFrozen(date) {
         timeOverride = date;
-        updateAddress(date);
+        updateAddress();
         document.body.classList.toggle('is-frozen', Boolean(date));
         timeNowButton.disabled = !date;
         timeStatus.textContent = date
@@ -673,21 +680,121 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tile.iconEl && tile.fraction !== undefined) {
                 tile.iconEl.innerHTML = tile.illustrate(tile.fraction);
             }
+            if (tile === focusTile) updateFocus();
         });
     }
 
+    // ---- Full page view ----------------------------------------------------
+    // One tile filling the browser window (not the Fullscreen API), with the
+    // value sized as large as fits. It's a <dialog>, so Escape closes it.
+    const focusView = document.getElementById('focusView');
+    const focusName = document.getElementById('focusName');
+    const focusValue = document.getElementById('focusValue');
+    const focusIcon = document.getElementById('focusIcon');
+    const focusReadout = document.getElementById('focusReadout');
+    const focusStage = document.getElementById('focusStage');
+    let fittedFor = ''; // the text shape the current font size was worked out for
+
+    function openFocus(tile) {
+        focusTile = tile;
+        focusName.textContent = tile.name;
+        // SVG elements don't have a .hidden property, so set the attribute itself.
+        focusIcon.toggleAttribute('hidden', !tile.illustrate);
+        focusView.classList.toggle('is-mono', Boolean(tile.mono));
+        fittedFor = '';
+        if (modal.open) modal.close();
+        focusView.showModal();
+        focusView.focus(); // focus the view itself, not the first button (no stray focus ring)
+        updateFocus();
+        updateAddress();
+    }
+
+    function updateFocus() {
+        if (!focusTile) return;
+        const text = focusTile.valueEl.textContent;
+        focusValue.textContent = text;
+        focusReadout.textContent = timeOverride ? `Frozen at ${readout.textContent}` : readout.textContent;
+        if (focusTile.iconEl) focusIcon.innerHTML = focusTile.iconEl.innerHTML;
+        // Refit only when the shape of the text changes (digits are fixed-width),
+        // so the size doesn't wobble every second.
+        const shape = text.replace(/\d/g, '0');
+        if (shape !== fittedFor) fitFocusValue(shape);
+    }
+
+    // Measure the text at 100px, then scale it to fill the space available.
+    function fitFocusValue(shape) {
+        fittedFor = shape;
+        focusValue.style.transform = '';
+        focusValue.style.fontSize = '100px';
+        const { width, height } = focusValue.getBoundingClientRect();
+        const stage = getComputedStyle(focusStage);
+        const roomWidth = focusStage.clientWidth - parseFloat(stage.paddingLeft) - parseFloat(stage.paddingRight);
+        const roomHeight = focusStage.clientHeight - parseFloat(stage.paddingTop) - parseFloat(stage.paddingBottom);
+        // Leave room for the picture (the moon) above the value, if there is one.
+        const iconHeight = focusIcon.hasAttribute('hidden') ? 0 : focusIcon.getBoundingClientRect().height + 24;
+        const scale = Math.min((roomWidth * 0.92) / width, ((roomHeight - iconHeight) * 0.9) / height);
+        const size = Math.max(16, Math.floor(100 * scale));
+        focusValue.style.fontSize = `${size}px`;
+        // Fonts leave more room above the letters than below, so text centred by
+        // its line box looks low. Nudge it so the visible shapes are centred.
+        focusValue.style.transform = `translateY(${-inkOffset(size).toFixed(1)}px)`;
+    }
+
+    // How far the middle of the visible letters sits below the middle of the
+    // text's line boxes, worked out from the font's real measurements.
+    const measureCtx = document.createElement('canvas').getContext('2d');
+    function inkOffset(size) {
+        const style = getComputedStyle(focusValue);
+        measureCtx.font = `${style.fontWeight} ${size}px ${style.fontFamily}`;
+        const lines = focusValue.textContent.split('\n');
+        let inkAscent = 0, inkDescent = -Infinity, fontAscent = 0, fontDescent = 0;
+        for (const line of lines) {
+            const m = measureCtx.measureText(line);
+            inkAscent = Math.max(inkAscent, m.actualBoundingBoxAscent);
+            inkDescent = Math.max(inkDescent, m.actualBoundingBoxDescent);
+            fontAscent = m.fontBoundingBoxAscent;
+            fontDescent = m.fontBoundingBoxDescent;
+        }
+        const lineHeight = parseFloat(style.lineHeight) || size * 1.1;
+        const firstBaseline = (lineHeight - (fontAscent + fontDescent)) / 2 + fontAscent;
+        const inkTop = firstBaseline - inkAscent;
+        const inkBottom = firstBaseline + (lines.length - 1) * lineHeight + inkDescent;
+        return (inkTop + inkBottom) / 2 - (lines.length * lineHeight) / 2;
+    }
+
+    // Refit once the web fonts have arrived, in case it was measured with a fallback.
+    document.fonts?.ready.then(() => { if (focusTile) { fittedFor = ''; updateFocus(); } });
+
+    window.addEventListener('resize', () => { if (focusTile) { fittedFor = ''; updateFocus(); } });
+
+    document.getElementById('focusClose').addEventListener('click', () => focusView.close());
+    focusView.addEventListener('close', () => {
+        const tile = focusTile;
+        focusTile = null;
+        updateAddress();
+        if (tile) tile.el.focus(); // put keyboard focus back on the tile it came from
+    });
+
     // Opened with ?t=… in the address? Start frozen at that moment.
     // A value without an offset is read as local time, like the picker.
-    const startTime = new URLSearchParams(location.search).get('t');
+    // Read both values before anything rewrites the address.
+    const startParams = new URLSearchParams(location.search);
+    const startTime = startParams.get('t');
+    const startShow = startParams.get('show');
     const startDate = startTime ? new Date(startTime) : null;
     if (startDate && !isNaN(startDate)) {
         timeInput.value = toInputValue(startDate);
         setFrozen(startDate); // also renders the tiles
     } else {
-        if (startTime) updateAddress(null); // drop a ?t= that couldn't be read
+        if (startTime) updateAddress(); // drop a ?t= that couldn't be read
         renderTiles();
     }
     setInterval(renderTiles, 1000);
+
+    // Opened with ?show=… in the address? Go straight to that tile, full page.
+    const showTile = tiles.find(t => t.id === startShow);
+    if (showTile) openFocus(showTile);
+    else if (startShow) updateAddress(); // drop a ?show= that doesn't match a tile
 
     // ---- Location --------------------------------------------------------
     // Only asked for when the button is pressed. If the browser has already
@@ -751,6 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
         codeSnippet.textContent = dedent(tile.func.toString());
         copyCodeButton.textContent = 'Copy code';
         modal.showModal();
+        modal.focus();
     }
 
     // toString() keeps the indentation from inside the tiles array; strip it
@@ -763,6 +871,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeModal.addEventListener('click', () => modal.close());
+    document.getElementById('fullPageButton').addEventListener('click', () => {
+        if (currentTile) openFocus(currentTile);
+    });
 
     // A click on the dialog itself (not its contents) is a click on the backdrop.
     modal.addEventListener('click', (event) => {
